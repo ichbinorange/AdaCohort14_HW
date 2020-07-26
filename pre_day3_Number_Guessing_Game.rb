@@ -1,5 +1,5 @@
 # generate a random number between 0 – 1000 (including 0, but not including 1000).
-rand_num = rand(999)
+rand_num = rand(1000)
 # assign a variable "total_guess" to calculate the user's total number of guesses.
 total_guess = 0
 
