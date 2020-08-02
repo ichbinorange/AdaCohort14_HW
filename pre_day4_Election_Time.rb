@@ -17,8 +17,8 @@
 def candidate_list(data)
   print "\nWe have #{ data.length } election candidates: "
   print data[0].upcase
-  (1...data.length).each do | num |
-    print ", #{ (data[ num ]).upcase }"
+  (1...data.length).each do |num|
+    print ", #{ (data[num]).upcase }"
   end
 end
 
@@ -75,14 +75,26 @@ puts "\nELECTION RESULTS...."
 # Re-print the final election candidates
 candidate_list(default_candidates)
 puts "\n\nVote Summary:"
-# Print total votes for each candidate
-(0...default_candidates.length).each do | num |
-  puts "#{ (default_candidates[num]).upcase } - #{ track_vote[num] } vote(s)"
+# Print total votes for each candidate and handle vote summary
+default_candidates.each_with_index do |candidate, index|
+  case track_vote[index]
+  when 1
+    puts "#{ candidate.upcase } - #{ track_vote[index] } vote"
+  else
+    puts "#{ candidate.upcase } - #{ track_vote[index] } votes"
+  end
 end
 
 # Verify a winner or a tie
 case track_vote.count(track_vote.max) 
-when 1 then puts "\nWINNER is #{ default_candidates[track_vote.index(track_vote.max)].upcase }!"
+when 1 
+  puts "\nWINNER is #{ default_candidates[track_vote.index(track_vote.max)].upcase }!"
 else 
-  puts "\nThere is a tie in the election, we haven't had a winner yet."
+  puts "\nThere is a tie in the election:"
+  track_vote.each_with_index do |vote, index|
+    if vote == track_vote.max
+      puts default_candidates[index].upcase
+    end
+  end
+  puts "They have the same number of votes - #{ track_vote.max }, we don't have a winner yet."
 end
