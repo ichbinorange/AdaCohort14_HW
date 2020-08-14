@@ -18,7 +18,7 @@
 
 puts "A password must contain 8 or more characters with at least a number, a symbol (@, %, *, !), a capital and a lowercase letter"
 # Create an array with all pattern matching requirement
-pw_require = [/[@%*!]/, /[0-9]/, /[A-Z]/, /[a-z]/] 
+pw_requires = [/[@%*!]/, /[0-9]/, /[A-Z]/, /[a-z]/] 
 
 # Run a loop to verify a password 
 while true
@@ -29,11 +29,11 @@ while true
   # Create a variable "require_check" to check pattern requirements
   require_check = 0
   # Verify pattern requirements 
-  pw_require.each do |element|
-    if element =~ new_pw
+  pw_requires.each do |requirement|
+    if requirement =~ new_pw
       require_check += 1
     else
-      puts "Your password must contain at least one #{ element.source }."
+      puts "Your password must contain at least one #{ requirement.source }."
     end
   end
   

@@ -24,25 +24,30 @@ student_information = []
 id_duplicate = []
 
 time_loop = 5
-puts "Please enter #{ time_loop } stduent name(s) (First and last name)."
+puts "Please enter #{ time_loop } student name(s) (First and last name)."
 time_loop.times do |num|
+  # Get a student name as well as remove the last whitespace if any
   print "First name of student ##{ num + 1 } ==> "
   first_name = gets.chomp
+  while first_name[-1] == " "
+    first_name = first_name[0, first_name.length - 1]
+  end
   print "Last name of student ##{ num + 1 } ==> "
   last_name = gets.chomp
+  while last_name[-1] == " "
+    last_name = last_name[0, last_name.length - 1]
+  end
+
   # Generate a hash to store all info on a student
   student_information[num] = Hash.new
   student_information[num][:name] = "#{ first_name.upcase } #{ last_name.upcase }" 
   # Generate random student ID without duplicates
   id_number = rand(111_111..999_999)
-  while id_number do
-    if id_duplicate.include? id_number
-      id_number = rand(111_111..999_999)
-    else
-      student_information[num][:id] = id_number
-      break
-    end
+  while id_duplicate.include? id_number
+    id_number = rand(111_111..999_999)
   end
+  id_duplicate.push(id_number)
+  student_information[num][:id] = id_number
   # Generate student email 
   if first_name.match(" ")
     student_information[num][:email] = "#{ first_name[0].upcase }#{ first_name[first_name.index(" ") + 1].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org"
@@ -53,4 +58,4 @@ end
 
 # Print out student info
 print "Name\t\t\t", " ID\t", " Email\n"
-student_information.each_with_index { |value, index| puts "#{ value[:name].ljust(18) }\t #{ value[:id] }\t #{ value[:email] }" } 
+student_information.each { |student| puts "#{ student[:name].ljust(18) }\t #{ student[:id] }\t #{ student[:email] }" } 

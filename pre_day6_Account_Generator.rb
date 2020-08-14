@@ -39,24 +39,28 @@ student_emails = []
 
 # Ask a user to enter 5 times
 time_loop = 5
-puts "Please enter #{ time_loop } stduent name(s) (First and last name)."
+puts "Please enter #{ time_loop } student name(s) (First and last name)."
 time_loop.times do |num|
+  # Get a student name as well as remove the last whitespace if any
   print "First name of student ##{ num + 1 } ==> "
   first_name = gets.chomp
+  while first_name[-1] == " "
+    first_name = first_name[0, first_name.length - 1]
+  end
   print "Last name of student ##{ num + 1 } ==> "
   last_name = gets.chomp
+  while last_name[-1] == " "
+    last_name = last_name[0, last_name.length - 1]
+  end
+
   # Store names in uppercase 
   student_names.push("#{ first_name.upcase } #{ last_name.upcase }")
   # Generate random student ID numbers from 111111 to 999999 without duplicates
   id_number = rand(111_111..999_999)
-  while id_number do
-    if student_id.include? id_number
-      id_number = rand(111_111..999_999)
-    else
-      student_id.push(id_number)
-      break
-    end
+  while student_id.include? id_number
+    id_number = rand(111_111..999_999)
   end
+  student_id.push(id_number)
   # Generate student email with handling first names with a space and last 3 digits of ID# less than 100 
   if first_name.match(" ")
     student_emails.push("#{ first_name[0].upcase }#{ first_name[first_name.index(" ") + 1].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org")
