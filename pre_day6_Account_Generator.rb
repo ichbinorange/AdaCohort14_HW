@@ -43,14 +43,16 @@ puts "Please enter #{ time_loop } student name(s) (First and last name)."
 time_loop.times do |num|
   # Get a student name as well as remove the last whitespace if any
   print "First name of student ##{ num + 1 } ==> "
-  first_name = gets.chomp
-  while first_name[-1] == " "
-    first_name = first_name[0, first_name.length - 1]
+  first_name = gets.chomp.strip
+  while first_name.empty?
+    print "First name of student ##{ num + 1 } can't be empty, please enter again ==> "
+    first_name = gets.chomp.strip
   end
   print "Last name of student ##{ num + 1 } ==> "
-  last_name = gets.chomp
-  while last_name[-1] == " "
-    last_name = last_name[0, last_name.length - 1]
+  last_name = gets.chomp.strip
+  while last_name.empty?
+    print "Last name of student ##{ num + 1 } can't be empty, please enter again ==> "
+    last_name = gets.chomp.strip
   end
 
   # Store names in uppercase 
