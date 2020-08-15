@@ -34,14 +34,14 @@
 
 # create three arrays
 student_names = []
-student_id = []
+student_ids = []
 student_emails = []
 
-# Ask a user to enter 5 times
+# Ask a user to enter 5 times thru times loop
 time_loop = 5
 puts "Please enter #{ time_loop } student name(s) (First and last name)."
 time_loop.times do |num|
-  # Get a student name as well as remove the last whitespace if any
+  # Get a student name and remove leading and trailing whitespaces
   print "First name of student ##{ num + 1 } ==> "
   first_name = gets.chomp.strip
   while first_name.empty?
@@ -59,10 +59,10 @@ time_loop.times do |num|
   student_names.push("#{ first_name.upcase } #{ last_name.upcase }")
   # Generate random student ID numbers from 111111 to 999999 without duplicates
   id_number = rand(111_111..999_999)
-  while student_id.include? id_number
+  while student_ids.include? id_number
     id_number = rand(111_111..999_999)
   end
-  student_id.push(id_number)
+  student_ids.push(id_number)
   # Generate student email with handling first names with a space and last 3 digits of ID# less than 100 
   if first_name.match(" ")
     student_emails.push("#{ first_name[0].upcase }#{ first_name[first_name.index(" ") + 1].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org")
@@ -71,9 +71,24 @@ time_loop.times do |num|
   end
 end
 
+def format_output(input_array)
+  print "\n| Value |"
+  input_array.each { |value| print " \"#{ value }\" |" }
+  print "\n| :---- |"
+  input_array.each { |value| print " :","-" * (value.to_s.length + 1)," |" }
+  print "\n| Index |"
+  input_array.each_with_index { |value, index| print " [#{ index }]"," " * (value.to_s.length - 1)," |" }
+  puts "\n"
+end
+# Print out the information in each array as Example output
+format_output(student_names)
+format_output(student_ids)
+format_output(student_emails)
+
 # Print out information in parallel
-print "Name\t\t\t", " ID\t", " Email\n"
-student_names.each_with_index { |value, index| puts "#{ value.ljust(18) }\t #{ student_id[index] }\t #{ student_emails[index] }" } 
+print "\nName\t\t\t\t", " ID\t", " Email\n"
+student_names.each_with_index { |value, index| puts "#{ value.ljust(25) }\t #{ student_ids[index] }\t #{ student_emails[index] }" } 
+
 
 # Haven't done yet
 # read in the student names from a file instead of the user and make the array size according 

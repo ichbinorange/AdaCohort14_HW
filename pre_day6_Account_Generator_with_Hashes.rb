@@ -25,8 +25,9 @@ id_duplicate = []
 
 time_loop = 5
 puts "Please enter #{ time_loop } student name(s) (First and last name)."
+# A single loop to drive the hash population
 time_loop.times do |num|
-  # Get a student name as well as remove the last whitespace if any
+  # Get a student name and remove leading and trailing whitespaces
   print "First name of student ##{ num + 1 } ==> "
   first_name = gets.chomp.strip
   while first_name.empty?
@@ -50,7 +51,7 @@ time_loop.times do |num|
   end
   id_duplicate.push(id_number)
   student_information[num][:id] = id_number
-  # Generate student email 
+  # Generate student email with handling first names with a space and last 3 digits of ID# less than 100 
   if first_name.match(" ")
     student_information[num][:email] = "#{ first_name[0].upcase }#{ first_name[first_name.index(" ") + 1].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org"
   else
@@ -59,5 +60,5 @@ time_loop.times do |num|
 end
 
 # Print out student info
-print "Name\t\t\t", " ID\t", " Email\n"
-student_information.each { |student| puts "#{ student[:name].ljust(18) }\t #{ student[:id] }\t #{ student[:email] }" } 
+print "Name\t\t\t\t", " ID\t", " Email\n"
+student_information.each { |student| puts "#{ student[:name].ljust(25) }\t #{ student[:id] }\t #{ student[:email] }" } 
