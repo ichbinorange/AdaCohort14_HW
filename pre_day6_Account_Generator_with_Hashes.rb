@@ -33,7 +33,7 @@ student_information = []
 # Create an array to deal with id# duplicates
 id_duplicate = []
 
-time_loop = 2
+time_loop = 5
 puts "Please enter #{ time_loop } student name(s) (First and last name)."
 # A single loop to drive the hash population
 time_loop.times do |num|
