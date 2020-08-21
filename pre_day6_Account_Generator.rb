@@ -32,6 +32,16 @@
 # on email generation, account for first names with a space in them
 # e.g. if the first name is "Mary Jane", then the first initial should be "MJ" rather than just "M"
 
+def name_verify(question)
+  print question
+  name = gets.chomp.strip
+  while name.empty?
+    print "#{question} can't be empty, please enter again ==> "
+    name = gets.chomp.strip
+  end
+  return name
+end
+
 # create three arrays
 student_names = []
 student_ids = []
@@ -42,33 +52,26 @@ time_loop = 5
 puts "Please enter #{ time_loop } student name(s) (First and last name)."
 time_loop.times do |num|
   # Get a student name and remove leading and trailing whitespaces
-  print "First name of student ##{ num + 1 } ==> "
-  first_name = gets.chomp.strip
-  while first_name.empty?
-    print "First name of student ##{ num + 1 } can't be empty, please enter again ==> "
-    first_name = gets.chomp.strip
-  end
-  print "Last name of student ##{ num + 1 } ==> "
-  last_name = gets.chomp.strip
-  while last_name.empty?
-    print "Last name of student ##{ num + 1 } can't be empty, please enter again ==> "
-    last_name = gets.chomp.strip
-  end
-
+  first_name_questions = "First name of student ##{ num + 1 } ==> "
+  first_name = name_verify(first_name_questions)
+  last_name_questions = "Last name of student ##{ num + 1 } ==> "
+  last_name = name_verify(last_name_questions)
   # Store names in uppercase 
   student_names.push("#{ first_name.upcase } #{ last_name.upcase }")
+
   # Generate random student ID numbers from 111111 to 999999 without duplicates
   id_number = rand(111_111..999_999)
   while student_ids.include? id_number
     id_number = rand(111_111..999_999)
   end
   student_ids.push(id_number)
-  # Generate student email with handling first names with a space and last 3 digits of ID# less than 100 
-  if first_name.match(" ")
-    student_emails.push("#{ first_name[0].upcase }#{ first_name[first_name.index(" ") + 1].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org")
-  else
-    student_emails.push("#{ first_name[0].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org")
+
+  # Generate student email with handling first names w/ space, last name w/ space, and the last 3 digits of ID# 
+  first_name_for_email = String.new
+  first_name.split.each do |name_element|
+    first_name_for_email << name_element[0]
   end
+  student_emails.push("#{ first_name_for_email.upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org")
 end
 
 def format_output(input_array)
@@ -86,8 +89,8 @@ format_output(student_ids)
 format_output(student_emails)
 
 # Print out information in parallel
-print "\nName\t\t\t\t", " ID\t", " Email\n"
-student_names.each_with_index { |value, index| puts "#{ value.ljust(25) }\t #{ student_ids[index] }\t #{ student_emails[index] }" } 
+print "\nName".ljust(30), "  ID\t", " Email\n"
+student_names.each_with_index { |value, index| puts "#{ value.ljust(30) } #{ student_ids[index] }\t #{ student_emails[index] }" } 
 
 
 # Haven't done yet

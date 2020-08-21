@@ -18,32 +18,34 @@
 # generate student email address from previous pieces of data
 # Update the printing functionality to utilize this new hash variable to print out student roster
 
+def name_verify(question)
+  print question
+  name = gets.chomp.strip
+  while name.empty?
+    print "#{question} can't be empty, please enter again ==> "
+    name = gets.chomp.strip
+  end
+  return name
+end
+
 # Create an array to store all student info
 student_information = []
 # Create an array to deal with id# duplicates
 id_duplicate = []
 
-time_loop = 5
+time_loop = 2
 puts "Please enter #{ time_loop } student name(s) (First and last name)."
 # A single loop to drive the hash population
 time_loop.times do |num|
   # Get a student name and remove leading and trailing whitespaces
-  print "First name of student ##{ num + 1 } ==> "
-  first_name = gets.chomp.strip
-  while first_name.empty?
-    print "First name of student ##{ num + 1 } can't be empty, please enter again ==> "
-    first_name = gets.chomp.strip
-  end
-  print "Last name of student ##{ num + 1 } ==> "
-  last_name = gets.chomp.strip
-  while last_name.empty?
-    print "Last name of student ##{ num + 1 } can't be empty, please enter again ==> "
-    last_name = gets.chomp.strip
-  end
-
+  first_name_questions = "First name of student ##{ num + 1 } ==> "
+  first_name = name_verify(first_name_questions)
+  last_name_questions = "Last name of student ##{ num + 1 } ==> "
+  last_name = name_verify(last_name_questions)
   # Generate a hash to store all info on a student
   student_information[num] = Hash.new
   student_information[num][:name] = "#{ first_name.upcase } #{ last_name.upcase }" 
+  
   # Generate random student ID without duplicates
   id_number = rand(111_111..999_999)
   while id_duplicate.include? id_number
@@ -51,14 +53,15 @@ time_loop.times do |num|
   end
   id_duplicate.push(id_number)
   student_information[num][:id] = id_number
+  
   # Generate student email with handling first names with a space and last 3 digits of ID# less than 100 
-  if first_name.match(" ")
-    student_information[num][:email] = "#{ first_name[0].upcase }#{ first_name[first_name.index(" ") + 1].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org"
-  else
-    student_information[num][:email] = "#{ first_name[0].upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org"
+  first_name_for_email = ""
+  first_name.split.each do |name_element|
+    first_name_for_email << name_element[0]
   end
+  student_information[num][:email] = "#{ first_name_for_email.upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org"
 end
 
 # Print out student info
-print "Name\t\t\t\t", " ID\t", " Email\n"
-student_information.each { |student| puts "#{ student[:name].ljust(25) }\t #{ student[:id] }\t #{ student[:email] }" } 
+print "%-30s %-10s" % ["\nName", " ID"], " Email\n"
+student_information.each { |student| print "%-30s %-10s" % ["#{ student[:name] }", "#{ student[:id] }"],"#{ student[:email] }\n" } 
