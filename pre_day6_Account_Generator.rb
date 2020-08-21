@@ -33,10 +33,10 @@
 # e.g. if the first name is "Mary Jane", then the first initial should be "MJ" rather than just "M"
 
 def name_verify(question)
-  print question
+  print "#{ question } ==> "
   name = gets.chomp.strip
   while name.empty?
-    print "#{question} can't be empty, please enter again ==> "
+    print "#{ question } can't be empty, please enter again ==> "
     name = gets.chomp.strip
   end
   return name
@@ -52,9 +52,9 @@ time_loop = 5
 puts "Please enter #{ time_loop } student name(s) (First and last name)."
 time_loop.times do |num|
   # Get a student name and remove leading and trailing whitespaces
-  first_name_questions = "First name of student ##{ num + 1 } ==> "
+  first_name_questions = "First name of student ##{ num + 1 }"
   first_name = name_verify(first_name_questions)
-  last_name_questions = "Last name of student ##{ num + 1 } ==> "
+  last_name_questions = "Last name of student ##{ num + 1 }"
   last_name = name_verify(last_name_questions)
   # Store names in uppercase 
   student_names.push("#{ first_name.upcase } #{ last_name.upcase }")
@@ -71,10 +71,20 @@ time_loop.times do |num|
   first_name.split.each do |name_element|
     first_name_for_email << name_element[0]
   end
-  student_emails.push("#{ first_name_for_email.upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org")
+
+  last_name_for_email = String.new
+  last_name_for_email = last_name if last_name.split.count == 1
+  if last_name.split.count > 1
+    (last_name.split.count - 1).times do |index|
+      last_name_for_email << last_name.split[index][0]
+    end
+    last_name_for_email << last_name.split[-1]
+  end
+
+  student_emails.push("#{ first_name_for_email.upcase }#{ last_name_for_email.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org")
 end
 
-def format_output(input_array)
+def output_format(input_array)
   print "\n| Value |"
   input_array.each { |value| print " \"#{ value }\" |" }
   print "\n| :---- |"
@@ -83,10 +93,11 @@ def format_output(input_array)
   input_array.each_with_index { |value, index| print " [#{ index }]"," " * (value.to_s.length - 1)," |" }
   puts "\n"
 end
+
 # Print out the information in each array as Example output
-format_output(student_names)
-format_output(student_ids)
-format_output(student_emails)
+output_format(student_names)
+output_format(student_ids)
+output_format(student_emails)
 
 # Print out information in parallel
 print "\nName".ljust(30), "  ID\t", " Email\n"

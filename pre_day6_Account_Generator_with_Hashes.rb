@@ -19,10 +19,10 @@
 # Update the printing functionality to utilize this new hash variable to print out student roster
 
 def name_verify(question)
-  print question
+  print "#{ question } ==> "
   name = gets.chomp.strip
   while name.empty?
-    print "#{question} can't be empty, please enter again ==> "
+    print "#{ question } can't be empty, please enter again ==> "
     name = gets.chomp.strip
   end
   return name
@@ -38,9 +38,9 @@ puts "Please enter #{ time_loop } student name(s) (First and last name)."
 # A single loop to drive the hash population
 time_loop.times do |num|
   # Get a student name and remove leading and trailing whitespaces
-  first_name_questions = "First name of student ##{ num + 1 } ==> "
+  first_name_questions = "First name of student ##{ num + 1 }"
   first_name = name_verify(first_name_questions)
-  last_name_questions = "Last name of student ##{ num + 1 } ==> "
+  last_name_questions = "Last name of student ##{ num + 1 }"
   last_name = name_verify(last_name_questions)
   # Generate a hash to store all info on a student
   student_information[num] = Hash.new
@@ -54,12 +54,22 @@ time_loop.times do |num|
   id_duplicate.push(id_number)
   student_information[num][:id] = id_number
   
-  # Generate student email with handling first names with a space and last 3 digits of ID# less than 100 
+  # Generate student email with handling first names w/ space, last name w/ space, and the last 3 digits of ID# 
   first_name_for_email = ""
   first_name.split.each do |name_element|
     first_name_for_email << name_element[0]
   end
-  student_information[num][:email] = "#{ first_name_for_email.upcase }#{ last_name.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org"
+
+  last_name_for_email = ""
+  last_name_for_email = last_name if last_name.split.count == 1
+  if last_name.split.count > 1
+    (last_name.split.count - 1).times do |index|
+      last_name_for_email << last_name.split[index][0]
+    end
+    last_name_for_email << last_name.split[-1]
+  end
+
+  student_information[num][:email] = "#{ first_name_for_email.upcase }#{ last_name_for_email.upcase }#{ id_number.to_s[3, 5] }@adadevelopersacademy.org"
 end
 
 # Print out student info
