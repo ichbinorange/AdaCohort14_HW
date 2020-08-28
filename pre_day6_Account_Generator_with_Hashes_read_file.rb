@@ -1,9 +1,6 @@
 ### Open a csv file
-
-# Create an array to store all student info
-student_information = []
-# Create an array to deal with id# duplicates
-id_duplicate = []
+# Please download the csv file (pre_day6_sample_for_Account_Generator_with_Hashes_read_file.csv) here: 
+# https://github.com/ichbinorange/AdaCohort14_HW/blob/master/pre_day6_sample_for_Account_Generator_with_Hashes_read_file.csv
 
 # Open a file thru argument
 # filename = ARGV.first
@@ -11,6 +8,11 @@ id_duplicate = []
 print "Please type the filename: "
 filename = $stdin.gets.chomp
 student_name_csv = open(filename)
+
+# Create an array to store all student info
+student_information = []
+# Create an array to deal with id# duplicates
+id_duplicate = []
 
 puts "\nHere's your file \"#{filename}\":"
 student_name_csv.readlines.map(&:chomp).each_with_index do |individual, index| 
@@ -49,8 +51,8 @@ student_name_csv.readlines.map(&:chomp).each_with_index do |individual, index|
   end
 end
 
-# Remove nil and blank string in an array, i.e. index 0
-student_information.compact!.delete_if{|arrVal| arrVal.class == String and arrVal.empty?}
+# Remove nil in an array, i.e. index 0
+student_information.compact!
 
 # Print out student info
 print "%-30s %-10s" % ["\nName", " ID"], " Email\n"
