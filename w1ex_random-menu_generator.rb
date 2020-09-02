@@ -1,4 +1,24 @@
-# Exercise:
+=begin
+Requirements:
+    Reinforce creating, using, and manipulating strings
+    Reinforce setting and accessing variables
+    Reinforce creating arrays
+    Reinforce accessing element(s) from an array
+=end
+
+=begin
+Optional Enhancements:
+    Expand your solution to ensure that no descriptive term in a menu item is ever repeated.
+       So if the first menu item is hot pan-fried dumplings, the the phrases hot,
+       pan-friend and dumpling cannot individually be used in any other menu items
+    Expand your solution to allow the user to determine how many items they'd like to see via user input
+        Note: You will need to ensure that this user-chosen number of items
+        is not larger than the number of items you have in your arrays.
+    Instead of using hardcoded or predefined arrays, make your program accept user input.
+        This user input will be utilized to generate the menu items.
+        You'll need to prompt for and store a varying number of entries for each food-type array
+=end
+
 # create a random menu generator to pull one item each from different arrays you make to create a combined "menu item".
 
 puts "--- Random Menu Generator ---"
@@ -50,24 +70,21 @@ q_foods = "What's your favorite Food: "
 ans_foods = input_to_array(q_foods, foods)
 
 # Verify the max items to show
-max_items_to_show = []
-[descriptors, cooking_methods, foods].each do |array|
-  max_items_to_show << array.length
-end
+max_items_to_show = [descriptors.length, cooking_methods.length, foods.length].min
 
 # Prompt a user input for how many dishes s/he wants to see
 puts %Q{
-We have #{ max_items_to_show.min } creative dishes on the menu to show to you.
+We have #{ max_items_to_show } creative dishes on the menu to show to you.
 How many dishes do you want to see?
 }
 
 # Verify user input to be an integer from 0 to max
 user_input = gets.chomp
-until user_input.to_i.to_s == user_input && user_input.to_i <= max_items_to_show.min && user_input.to_i >= 0
+until user_input.to_i.to_s == user_input && user_input.to_i <= max_items_to_show && user_input.to_i >= 0
   if user_input.to_i.to_s != user_input
     print "Please enter an integer => "
-  elsif user_input.to_i > max_items_to_show.min || user_input.to_i < 0
-    print "Please enter an integer from 0 to #{ max_items_to_show.min } => "
+  elsif user_input.to_i > max_items_to_show || user_input.to_i < 0
+    print "Please enter an integer from 0 to #{ max_items_to_show } => "
   end
   user_input = gets.chomp
 end
@@ -80,13 +97,5 @@ random_methods = cooking_methods.sample(user_input.to_i)
 random_foods = foods.sample(user_input.to_i)
 
 # Print the menu
-i = 0
-while i < user_input.to_i
-  puts "#{ i+1 }. #{ random_descriptors[i] } #{ random_methods[i] } #{ random_foods[i] }"
-  i += 1
-end
-
-
-
-
+user_input.to_i.times { |i| puts "#{ i+1 }. #{ random_descriptors[i] } #{ random_methods[i] } #{ random_foods[i] }" }
 
