@@ -32,27 +32,80 @@ To do list:
 # Define a Class to do math calculation
 class Calculator
   def operator_verify(user_input, working_operators)
+    # Prompt user input till they enter a valid operator
     until ((1..working_operators.size).any? { |num| num.to_s == user_input}) || (working_operators.any? {|sub_array| sub_array.any? user_input})
       print "\nInvalid operator, please try again ==> "
       user_input = gets.chomp.strip.downcase
     end
+
+    # Convert user input if they enter numbers
     if user_input =~ /\d/
       user_input = working_operators[user_input.to_i - 1][0]
-      return user_input
     else
-      return user_input
+      user_input = user_input
     end
+    return user_input
   end
 
-  def value_verify(num)
-    until num =~ /^[-+]?(\d+[.])?\d+$/ || num =~ /^[-+]?([.]+\d)?\d+$/
-      print "\nYou must enter a number, try again ==> "
-      num = gets.chomp
+  def num_or_parenthesis_verify(num)
+    # Prompt user input till they enter a valid number or a valid (equation)
+    num = num.gsub(/\s+/, "")
+    parenthesis_format = %r{\(
+      ([-+]?\d*\.?\d*)
+      ([\+\-\/\%]|[\*]+)
+      ([-+]?\d*\.?\d*)
+      \)
+    }x
+    num_format = /^[-+]?\d*\.?\d*$/  # /^\-?(\d+\.?\d*|\d*\.?\d+)$/ works too
+    until !(num.empty?) && ((num.match? (parenthesis_format)) || (num.match? (num_format)))
+      print "That's a wrong math expression, please try again ==> "
+      num = gets.chomp.strip
     end
-    return num # num is a string
+
+    # Translate user input if it's an array
+    if num.match? (parenthesis_format)
+      p_num1, p_operator, p_num2 = parenthesis_format.match(num).captures
+      num = [p_num1, p_operator, p_num2] # num is an array
+    elsif num.match? (num_format)
+      num = num # num is a string
+    end
+    return num
+  end
+
+  def denominator_not_zero(num1, num2)
+    # Divide/modulo by 0 is undefined, prompt user input till the second num is not zero
+    print "#{ num1 } divided by #{ num2 } is undefined, please re-enter the second number ==> "
+    num2 = gets.chomp.strip
+    num2 = num_or_parenthesis_verify(num2)
+    return num2
+  end
+
+  def parenthesis_denominator_not_zero(array_num)
+    # Divide/modulo by 0 is undefined inside the parenthesis,
+    # prompt user input till the denominator in the parenthesis is not zero
+    while ((array_num[1] == "divide" || array_num[1] == "/") || (array_num[1] == "modulo" || array_num[1] == "%")) && (array_num[2].to_f == 0.0)
+      print "#{ array_num[0] } divided by #{ array_num[2] } is undefined, please re-enter the number ==> "
+      array_num = gets.chomp.strip
+      array_num = num_or_parenthesis_verify(array_num)
+      if array_num.class == String
+        break
+      end
+    end
+    return array_num
+  end
+
+  def calculate_data_in_parenthesis(num)
+    # Calculate the result inside the parenthesis
+    if num.class == Array
+      num = result_calculate(num[1], num[0], num[2])
+    else
+      num = num
+    end
+    return num
   end
 
   def result_calculate(user_operator, num1, num2)
+    # Calculate the result
     num1 = num1.to_f
     num2 = num2.to_f
     case user_operator
@@ -69,12 +122,14 @@ class Calculator
     when "modulo", "%"
       result = num1 % num2
     end
+    return result
   end
 
   def power_exp(num1, num2)
-    result_calculate2 = num2.to_f
-    if result_calculate2 > 0 && ((result_calculate2 % 1).zero?)
-      print "#{ num1 }" + " * #{ num1 }" * (result_calculate2-1)
+    # Format the power exponent
+    result_express = num2.to_f
+    if result_express > 0 && ((result_express % 1).zero?) # result_express is a positive integer
+      print "#{ num1 }" + " * #{ num1 }" * (result_express-1)
     else
       print "#{ num1 } ^ #{ num2 }"
     end
@@ -84,44 +139,94 @@ end
 # Create a variable for usable operators
 operators = [["add", "+"], ["substract", "-"], ["multiply", "*"], ["divide", "/"], ["power", "**"], ["modulo", "%"]]
 
-initial_calculator = Calculator.new
+my_calculator = Calculator.new
 
 # Print the usable operators and prompt user input
-puts "Welcome to the two-number Calculator program! Which operator would you like to use?"
+puts %Q{
+Welcome to my Calculator program!
+This calculator doesn't like imaginary numbers,
+but it supports (a+b) format, ex (5/5) + 10 or 6 - (18.6 % 7), try to play with it!
+\nNow, which operator would you like to use?"
+}
 operators.each_with_index { |value, index| puts "#{ index+1 }. #{ value[0] }(#{ value[1] })" }
 print "==> "
-# Handle all cases (uppercase, capitals) for the operations
+# Handle all cases (uppercase, capitals)
 user_operator = gets.chomp.strip.downcase
-# Verify the user input for operator
-user_operator = initial_calculator.operator_verify(user_operator, operators)
+# Verify the operator from user input
+user_operator = my_calculator.operator_verify(user_operator, operators)
 
-# Prompt user inputs and verify the numbers
+# Prompt user inputs and verify number1
 print "First number is ==> "
 number1 = gets.chomp
-number1 = initial_calculator.value_verify(number1)
+number1 = my_calculator.num_or_parenthesis_verify(number1)
+number1_accept = false
+until number1_accept
+  # Verify num1's denominator inside the parenthesis to not be zero for divide & modulo eq
+  if number1.class == Array
+    number1 = my_calculator.parenthesis_denominator_not_zero(number1)
+  end
+  number1 = my_calculator.calculate_data_in_parenthesis(number1)
 
-print "Second number is ==> "
-number2 = gets.chomp
-number2 = initial_calculator.value_verify(number2)
-# Divide/modulo by 0 is undefined, prompt user input for number2 till it's not zero
-while ((user_operator == "divide" || user_operator == "/") || (user_operator == "modulo" || user_operator == "%")) && (number2.to_f == 0)
-  print "#{ number1 } can't be divided by #{ number2 }, please re-enter the second number ==> "
-  number2 = gets.chomp
-  number2 = initial_calculator.value_verify(number2)
+  # # Check if num1 is an imaginary number
+  if Complex(number1).imaginary == 0
+    number1_accept = true
+  else
+    puts "This calculator doesn't like imaginary numbers, please try again."
+    print "\nFirst number is ==> "
+    number1 = gets.chomp
+    number1 = my_calculator.num_or_parenthesis_verify(number1)
+  end
 end
 
-# Calculate a result and verify the result an integer or a float
+# Prompt user inputs and verify number2
+print "Second number is ==> "
+number2 = gets.chomp
+number2 = my_calculator.num_or_parenthesis_verify(number2)
+number2_accept = false
+until number2_accept
+  # verify num2's denominator inside the parenthesis to not be zero for divide & modulo eq
+  if number2.class == Array
+    number2 = my_calculator.parenthesis_denominator_not_zero(number2)
+  end
+  number2 = my_calculator.calculate_data_in_parenthesis(number2)
+
+  # Check if num2 is an imaginary number
+  if Complex(number2).imaginary == 0
+    # verify num2's denominator to not be zero for divide & modulo eq
+    if (number2.to_f == 0.0) && ((user_operator == "divide" || user_operator == "/") || (user_operator == "modulo" || user_operator == "%"))
+      number2 = my_calculator.denominator_not_zero(number1, number2)
+    else
+      number2_accept = true
+    end
+  else
+    puts "This calculator doesn't like imaginary numbers, please try again."
+    print "\nSecond number is ==> "
+    number2 = gets.chomp
+    number2 = my_calculator.num_or_parenthesis_verify(number2)
+  end
+end
+
+# Calculate the result
 operators.each do |operator|
   if operator.include? (user_operator)
-    result = initial_calculator.result_calculate(user_operator, number1, number2)
-    if ((result % 1).zero?) && (user_operator == "power" || user_operator == "**")
-      puts "#{ initial_calculator.power_exp(number1, number2) } = #{ result.to_i }"
-    elsif (result % 1).zero?
-      puts "#{ number1 } #{ operator[1] } #{ number2 } = #{ result.to_i }"
-    elsif !((result % 1).zero?) && (user_operator == "power" || user_operator == "**")
-      puts "#{ initial_calculator.power_exp(number1, number2) } = #{ '%.2f' % result }}"
+    result = my_calculator.result_calculate(user_operator, number1, number2)
+    # Check if the result is an imaginary number
+    if Complex(result).imaginary == 0
+      # Print out input numbers and the result in a line,
+      # present computing exponents (power/**), and
+      # verify the result to present with integer or float
+      if ((result % 1).zero?) && (user_operator == "power" || user_operator == "**")
+        puts "\n#{ my_calculator.power_exp(number1, number2) } = #{ result.to_i }"
+      elsif ((result % 1).zero?) && !(user_operator == "power" || user_operator == "**")
+        puts "\n#{ number1 } #{ operator[1] } #{ number2 } = #{ result.to_i }"
+      elsif !((result % 1).zero?) && (user_operator == "power" || user_operator == "**")
+        puts "\n#{ my_calculator.power_exp(number1, number2) } = #{ '%.2f' % result }}"
+      else
+        puts "\n#{ number1 } #{ operator[1] } #{ number2 } = #{ '%.2f' % result }"
+      end
     else
-      puts "#{ number1 } #{ operator[1] } #{ number2 } = #{ '%.2f' % result }"
+      puts "\nCalculation error."
+      puts "Oops, this calculator doesn't like imaginary numbers."
     end
   end
 end
