@@ -50,16 +50,16 @@ class Calculator
   def num_or_parenthesis_verify(num)
     # Prompt user input till they enter a valid number or a valid (equation)
     num = num.gsub(/\s+/, "")
-    parenthesis_format = %r{\(
+    parenthesis_format = %r{\A\(
       ([-+]?\d*\.?\d*)
       ([\+\-\/\%]|[\*]+)
       ([-+]?\d*\.?\d*)
       \)
-    }x
-    num_format = /^[-+]?\d*\.?\d*$/  # /^\-?(\d+\.?\d*|\d*\.?\d+)$/ works too
-    until !(num.empty?) && ((num.match? (parenthesis_format)) || (num.match? (num_format)))
+    \Z}x
+    num_format = /^[-]?\d*\.?\d*$/  # /^\-?(\d+\.?\d*|\d*\.?\d+)$/ works too
+    until !((num.empty?) || (num == "-")) && ((num.match? (parenthesis_format)) || (num.match? (num_format)))
       print "That's a wrong math expression, please try again ==> "
-      num = gets.chomp.strip
+      num = gets.gsub(/\s+/, "")
     end
 
     # Translate user input if it's an array
