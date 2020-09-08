@@ -128,8 +128,10 @@ class Calculator
   def power_exp(num1, num2)
     # Format the power exponent
     result_express = num2.to_f
-    if result_express > 0 && ((result_express % 1).zero?) # result_express is a positive integer
+    if (result_express > 0) && (result_express <= 10) && ((result_express % 1).zero?) # result_express is a positive integer
       print "#{ num1 }" + " * #{ num1 }" * (result_express-1)
+    elsif (result_express > 0) && (result_express > 10) && ((result_express % 1).zero?) 
+      print "#{ num1 } ^ #{ num2 }"
     else
       print "#{ num1 } ^ #{ num2 }"
     end
@@ -146,7 +148,7 @@ puts %Q{
 Welcome to my Calculator program!
 This calculator doesn't like imaginary numbers,
 but it supports (a+b) format, ex (5/5) + 10 or 6 - (18.6 % 7), try to play with it!
-\nNow, which operator would you like to use?"
+\nNow, which operator would you like to use?
 }
 operators.each_with_index { |value, index| puts "#{ index+1 }. #{ value[0] }(#{ value[1] })" }
 print "==> "
