@@ -57,7 +57,7 @@ class Calculator
       \)
     \Z}x
     num_format = /^[-+]?\d*\.?\d*$/  # /^\-?(\d+\.?\d*|\d*\.?\d+)$/ works too
-    until !((num.empty?) || (num == "-") || (num == "+") || (num == ".")) && ((num.match? (parenthesis_format)) || (num.match? (num_format)))
+    until !((num.empty?) || (num.match? (/^[-+.]$/))) && ((num.match? (parenthesis_format)) || (num.match? (num_format)))
       print "That's an invalid input in this calculator, please try again ==> "
       num = gets.gsub(/\s+/, "")
     end
@@ -109,7 +109,7 @@ class Calculator
     if num.class == Array
       num = result_calculate(num[1], num[0], num[2])
     else
-      num = num
+      num = num.to_f
     end
     return num
   end
