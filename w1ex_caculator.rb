@@ -136,6 +136,15 @@ class Calculator
       print "#{ num1 } ^ #{ num2 }"
     end
   end
+
+  def non_power_eq(num)
+    if num.class == Array
+      num = "(#{ num.join(" ") })"
+    else
+      num = num
+    end
+    return num
+  end
 end
 
 # Create a variable for usable operators
@@ -165,7 +174,10 @@ number1_accept = false
 until number1_accept
   # Verify num1's denominator inside the parenthesis to not be zero for divide & modulo eq
   if number1.class == Array
+    num1_eq = number1.clone.map(&:clone)
     number1 = my_calculator.parenthesis_denominator_not_zero(number1)
+  else
+    num1_eq = number1
   end
   number1 = my_calculator.calculate_data_in_parenthesis(number1)
 
@@ -188,7 +200,10 @@ number2_accept = false
 until number2_accept
   # verify num2's denominator inside the parenthesis to not be zero for divide & modulo eq
   if number2.class == Array
+    num2_eq = number2.clone.map(&:clone)
     number2 = my_calculator.parenthesis_denominator_not_zero(number2)
+  else
+    num2_eq = number2
   end
   number2 = my_calculator.calculate_data_in_parenthesis(number2)
 
@@ -220,11 +235,11 @@ operators.each do |operator|
       if ((result % 1).zero?) && (user_operator == "power" || user_operator == "**")
         puts "\n#{ my_calculator.power_exp(number1, number2) } = #{ result.to_i }"
       elsif ((result % 1).zero?) && !(user_operator == "power" || user_operator == "**")
-        puts "\n#{ number1 } #{ operator[1] } #{ number2 } = #{ result.to_i }"
+        puts "\n#{ my_calculator.non_power_eq(num1_eq) } #{ operator[1] } #{ my_calculator.non_power_eq(num2_eq) } = #{ result.to_i }"
       elsif !((result % 1).zero?) && (user_operator == "power" || user_operator == "**")
-        puts "\n#{ my_calculator.power_exp(number1, number2) } = #{ '%.2f' % result }}"
+        puts "\n#{ my_calculator.power_exp(number1, number2) } = #{ result }}"
       else
-        puts "\n#{ number1 } #{ operator[1] } #{ number2 } = #{ '%.2f' % result }"
+        puts "\n#{ my_calculator.non_power_eq(num1_eq) } #{ operator[1] } #{ my_calculator.non_power_eq(num2_eq) } = #{ result }"
       end
     else
       puts "\nCalculation error."
