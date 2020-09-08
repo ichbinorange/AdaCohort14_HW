@@ -79,7 +79,7 @@ class Calculator
     if num.match? (parenthesis_format)
       p_num1, p_operator, p_num2 = parenthesis_format.match(num).captures
       num = [p_num1, p_operator, p_num2] # num is an array
-      if num.any? ("")
+      if (num.any? ("")) || (num.any? (".")) || (num.any? ("+")) || (num.any? ("-")) 
         print "That's an invalid input in this calculator, please try again ==> "
         num = gets.chomp.strip
         num = num_or_parenthesis_verify(num)
