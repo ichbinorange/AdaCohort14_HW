@@ -131,26 +131,26 @@ riders_data.each do |driver, rides|
 end
 
 # Handle ranking questions, even with a tie
-def drivers_ranking(data_for_riders, symbol)
-  if symbol == :cost
+def drivers_ranking(data_for_riders, request_info)
+  if request_info == "cost"
     money_ranking = Hash.new
     data_for_riders.each do |driver, rides|   
-      money_ranking[driver] = rides.sum { |info| info[symbol] }  
+      money_ranking[driver] = rides.sum { |info| info[:cost] }  
     end
     ranking_for_drivers = money_ranking.select { |driver, value| value == (money_ranking.max_by { |driver,earning| earning })[1] }
 
-  elsif symbol == :rating
+  elsif request_info == "rating"
     ave_rating_ranking = Hash.new
     data_for_riders.each do |driver, rides|   
-      ave_rating_ranking[driver] = (rides.sum { |info| info[symbol] } / rides.count).to_f
+      ave_rating_ranking[driver] = (rides.sum { |info| info[:rating] } / rides.count).to_f
     end
     ranking_for_drivers = ave_rating_ranking.filter { |driver, value| value == (ave_rating_ranking.max_by { |driver, rating| rating })[1] }
   end
   return ranking_for_drivers
 end
 
-def is_tie?(ranking_data, symbol)
-  if symbol == :cost
+def is_tie?(ranking_data, request_info)
+  if request_info == "cost"
     if ranking_data.count > 1
       puts "There are #{ ranking_data.count } drivers have the same most earnings!"
       ranking_data.each { |driver, earning| puts "==> Driver \"#{ driver }\" has earned the most money $#{ earning }" }
@@ -158,7 +158,7 @@ def is_tie?(ranking_data, symbol)
       ranking_data.each { |driver, earning| puts "==> Driver \"#{ driver }\" has earned the most money $#{ earning }" }
     end
 
-  elsif symbol == :rating
+  elsif request_info == "rating"
     if ranking_data.count > 1
       puts "There are #{ ranking_data.count } drivers have the same highest ratings!"
       ranking_data.each { |driver, rating| puts "==> Driver \"#{ driver }\" has the highest rating #{ rating }" }
@@ -170,10 +170,10 @@ end
 
 
 puts "\nWhich driver made the most money?"
-is_tie?(drivers_ranking(riders_data, :cost), :cost)
+is_tie?(drivers_ranking(riders_data, "cost"), "cost")
 
 puts "\nWhich driver has the highest average rating?"
-is_tie?(drivers_ranking(riders_data, :rating), :rating)
+is_tie?(drivers_ranking(riders_data, "rating"), "rating")
 
 # # Optional, on which days did a driver make the most money
 puts "\nFor each driver, on which day did they make the most money?"
