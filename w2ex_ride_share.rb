@@ -98,19 +98,26 @@ rides_share = [
 ]
 
 # Restructure the data based on each driver
-riders_data = Hash.new
+ride_share_raw_data = Hash[drivers: Hash.new, riders: Hash.new]
 rides_share.each do |ride|
-  if riders_data.has_key? ride[:driver_id]
-    riders_data[ride[:driver_id]] << Hash(date: ride[:date], cost: ride[:cost], rider_id: ride[:rider_id], rating: ride[:rating])
-  else # new driver to riders_data
-    riders_data[ride[:driver_id]] = Array.new
-    riders_data[ride[:driver_id]] << Hash(date: ride[:date], cost: ride[:cost], rider_id: ride[:rider_id], rating: ride[:rating])
+  if ride_share_raw_data[:drivers].has_key? ride[:driver_id]
+    ride_share_raw_data[:drivers][ride[:driver_id]] << Hash(date: ride[:date], cost: ride[:cost], rider_id: ride[:rider_id], rating: ride[:rating])
+  else # add a new driver to ride_share_raw_data
+    ride_share_raw_data[:drivers][ride[:driver_id]] = Array.new
+    ride_share_raw_data[:drivers][ride[:driver_id]] << Hash(date: ride[:date], cost: ride[:cost], rider_id: ride[:rider_id], rating: ride[:rating])
+  end
+
+  if ride_share_raw_data[:riders].has_key? ride[:rider_id]
+    ride_share_raw_data[:riders][ride[:rider_id]] << Hash(driver_id: ride[:driver_id], date: ride[:date], cost: ride[:cost], rating: ride[:rating])
+  else # add a new driver to ride_share_raw_data
+    ride_share_raw_data[:riders][ride[:rider_id]] = Array.new
+    ride_share_raw_data[:riders][ride[:rider_id]] << Hash(driver_id: ride[:driver_id], date: ride[:date], cost: ride[:cost], rating: ride[:rating])
   end
 end
-# pp riders_data
+pp ride_share_raw_data
 
 puts "The number of rides each driver has given:"
-riders_data.each do |driver, rides|
+ride_share_raw_data[:drivers].each do |driver, rides|
   if rides.count < 2
     puts "Driver \"#{ driver }\" has given #{ rides.count } ride."
   else
@@ -119,13 +126,13 @@ riders_data.each do |driver, rides|
 end
 
 puts "\nThe total amount of money each driver has made:"
-riders_data.each do |driver, rides| 
+ride_share_raw_data[:drivers].each do |driver, rides| 
   total_amount = rides.sum { |ride_detail| ride_detail[:cost] }
   puts "Driver \"#{ driver }\" has earned $#{ total_amount.to_f }." 
 end
 
 puts "\nThe average rating for each driver:"
-riders_data.each do |driver, rides| 
+ride_share_raw_data[:drivers].each do |driver, rides| 
   total_rating = rides.sum { |ride_detail| ride_detail[:rating] }
   puts "Driver \"#{ driver }\" has got the average rating for #{ (total_rating / rides.count).to_f }." 
 end
@@ -170,19 +177,19 @@ end
 
 
 puts "\nWhich driver made the most money?"
-is_tie?(drivers_ranking(riders_data, "cost"), "cost")
+is_tie?(drivers_ranking(ride_share_raw_data[:drivers], "cost"), "cost")
 
 puts "\nWhich driver has the highest average rating?"
-is_tie?(drivers_ranking(riders_data, "rating"), "rating")
+is_tie?(drivers_ranking(ride_share_raw_data[:drivers], "rating"), "rating")
 
 # # Optional, on which days did a driver make the most money
 puts "\nFor each driver, on which day did they make the most money?"
-riders_data.each do |driver, rides|
+ride_share_raw_data[:drivers].each do |driver, rides|
   each_day_earning = Hash.new
   rides.each do |ride|
     if each_day_earning.include? (ride[:date])
       each_day_earning[ride[:date]] += ride[:cost]
-    else
+    else  # add a new date to each_day_earning
       each_day_earning[ride[:date]] = ride[:cost]
     end
   end
