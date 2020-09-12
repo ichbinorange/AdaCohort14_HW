@@ -21,7 +21,7 @@ rides_share = [
   {
     driver_id: "DR0004",
     date: "3rd Feb 2016",
-    cost: 5,
+    cost: 5,  
     rider_id: "RD0022",
     rating: 5
   },
@@ -77,7 +77,7 @@ rides_share = [
   {
     driver_id: "DR0002",
     date: "5th Feb 2016",
-    cost: 35,
+    cost: 35,     
     rider_id: "RD0066",
     rating: 3
   },
@@ -93,7 +93,7 @@ rides_share = [
     date: "5th Feb 2016",
     cost: 45,
     rider_id: "RD0003",
-    rating: 2
+    rating: 2  
   }
 ]
 
@@ -101,59 +101,98 @@ rides_share = [
 riders_data = Hash.new
 rides_share.each do |ride|
   if riders_data.has_key? ride[:driver_id]
-    riders_data[ride[:driver_id]][:date] << ride[:date]
-    riders_data[ride[:driver_id]][:cost] << ride[:cost]
-    riders_data[ride[:driver_id]][:rider_id] << ride[:rider_id]
-    riders_data[ride[:driver_id]][:rating] << ride[:rating]
-
-  else
-    riders_data[ride[:driver_id]] = Hash.new
-    riders_data[ride[:driver_id]][:date] = Array(ride[:date])
-    riders_data[ride[:driver_id]][:cost] = Array(ride[:cost])
-    riders_data[ride[:driver_id]][:rider_id] = Array(ride[:rider_id])
-    riders_data[ride[:driver_id]][:rating] = Array(ride[:rating])
+    riders_data[ride[:driver_id]] << Hash(date: ride[:date], cost: ride[:cost], rider_id: ride[:rider_id], rating: ride[:rating])
+  else # new driver to riders_data
+    riders_data[ride[:driver_id]] = Array.new
+    riders_data[ride[:driver_id]] << Hash(date: ride[:date], cost: ride[:cost], rider_id: ride[:rider_id], rating: ride[:rating])
   end
 end
+# pp riders_data
 
 puts "The number of rides each driver has given:"
-riders_data.each do |key, value|
-  if value[:date].count <= 1
-    puts "Driver \"#{ key }\" has given #{ value[:date].count } ride."
+riders_data.each do |driver, rides|
+  if rides.count < 2
+    puts "Driver \"#{ driver }\" has given #{ rides.count } ride."
   else
-    puts "Driver \"#{ key }\" has given #{ value[:date].count } rides."
+    puts "Driver \"#{ driver }\" has given #{ rides.count } rides."
   end
 end
 
 puts "\nThe total amount of money each driver has made:"
-riders_data.each do |key, value|
-  puts "Driver \"#{ key }\" has earned $#{ value[:cost].sum.to_f }."
+riders_data.each do |driver, rides| 
+  total_amount = rides.sum { |ride_detail| ride_detail[:cost] }
+  puts "Driver \"#{ driver }\" has earned $#{ total_amount.to_f }." 
 end
 
 puts "\nThe average rating for each driver:"
-riders_data.each do |key, value|
-  puts "Driver \"#{ key }\" got the average rating for #{ (value[:rating].sum / value[:rating].count).to_f }."
+riders_data.each do |driver, rides| 
+  total_rating = rides.sum { |ride_detail| ride_detail[:rating] }
+  puts "Driver \"#{ driver }\" has got the average rating for #{ (total_rating / rides.count).to_f }." 
 end
 
-# Handle ranking questions
-driver_earn_the_most = { :driver=> nil, :earning=> 0 }
-highest_ave_rating = { :driver=> nil, :rating=> 0 }
-riders_data.each do |key, value|
-  if value[:cost].sum > driver_earn_the_most[:earning]
-    driver_earn_the_most[:driver] = key
-    driver_earn_the_most[:earning] = value[:cost].sum
+# Handle ranking questions, even with a tie
+def drivers_ranking(data_for_riders, symbol)
+  if symbol == :cost
+    money_ranking = Hash.new
+    data_for_riders.each do |driver, rides|   
+      money_ranking[driver] = rides.sum { |info| info[symbol] }  
+    end
+    ranking_for_drivers = money_ranking.select { |driver, value| value == (money_ranking.max_by { |driver,earning| earning })[1] }
+
+  elsif symbol == :rating
+    ave_rating_ranking = Hash.new
+    data_for_riders.each do |driver, rides|   
+      ave_rating_ranking[driver] = (rides.sum { |info| info[symbol] } / rides.count).to_f
+    end
+    ranking_for_drivers = ave_rating_ranking.filter { |driver, value| value == (ave_rating_ranking.max_by { |driver, rating| rating })[1] }
   end
-  if (value[:rating].sum / value[:rating].count).to_f > highest_ave_rating[:rating]
-    highest_ave_rating[:driver] = key
-    highest_ave_rating[:rating] = (value[:rating].sum / value[:rating].count).to_f
+  return ranking_for_drivers
+end
+
+def is_tie?(ranking_data, symbol)
+  if symbol == :cost
+    if ranking_data.count > 1
+      puts "There are #{ ranking_data.count } drivers have the same most earnings!"
+      ranking_data.each { |driver, earning| puts "==> Driver \"#{ driver }\" has earned the most money $#{ earning }" }
+    else
+      ranking_data.each { |driver, earning| puts "==> Driver \"#{ driver }\" has earned the most money $#{ earning }" }
+    end
+
+  elsif symbol == :rating
+    if ranking_data.count > 1
+      puts "There are #{ ranking_data.count } drivers have the same highest ratings!"
+      ranking_data.each { |driver, rating| puts "==> Driver \"#{ driver }\" has the highest rating #{ rating }" }
+    else
+      ranking_data.each { |driver, rating| puts "==> Driver \"#{ driver }\" has the highest rating #{ rating }" }
+    end
   end
 end
+
+
 puts "\nWhich driver made the most money?"
-puts "==> Driver \"#{ driver_earn_the_most[:driver] }\" has earned the most money $#{ driver_earn_the_most[:earning].to_f }"
+is_tie?(drivers_ranking(riders_data, :cost), :cost)
 
 puts "\nWhich driver has the highest average rating?"
-puts "==> Driver \"#{ highest_ave_rating[:driver] }\" got the highest average rating for #{ highest_ave_rating[:rating].to_f }"
+is_tie?(drivers_ranking(riders_data, :rating), :rating)
 
+# # Optional, on which days did a driver make the most money
 puts "\nFor each driver, on which day did they make the most money?"
-riders_data.each do |key, value|
-  puts "Driver \"#{ key }\" earned the most money on #{ value[:date][value[:cost].index(value[:cost].max)] }"
+riders_data.each do |driver, rides|
+  each_day_earning = Hash.new
+  rides.each do |ride|
+    if each_day_earning.include? (ride[:date])
+      each_day_earning[ride[:date]] += ride[:cost]
+    else
+      each_day_earning[ride[:date]] = ride[:cost]
+    end
+  end
+  earn_the_most = each_day_earning.max_by(each_day_earning.count) { |day, earning| earning }
+  tie_date = Array.new
+  earn_the_most.each do |day| 
+    if day[1] == earn_the_most[0][1]
+      tie_date.push(day[0])
+    end
+  end
+  puts "Driver \"#{ driver }\" earned the most money $#{ earn_the_most[0][1].to_f } on #{ tie_date.join(", ") }."
 end
+
